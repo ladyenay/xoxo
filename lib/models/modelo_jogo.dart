@@ -19,9 +19,9 @@ class ModeloJogo {
       verificarVencedor();
 
       if (modo == 'PvM' && jogadorAtual == 'X' && vencedor.isEmpty) {
-        Future.delayed(const Duration(milliseconds: 500), () {
+        {
           jogadaMaquina();
-        });
+        }
       } else {
         alternarJogador();
       }
@@ -31,67 +31,15 @@ class ModeloJogo {
   void jogadaMaquina() {
     if (vencedor.isEmpty && rodadas < 9) {
       int posicao;
-      int dificuldade = 1; // Definindo dificuldade para a máquina (fácil por padrão)
       do {
-        posicao = escolherPosicaoMaquina(dificuldade);
-      } while (tabuleiro[posicao].isNotEmpty);
+        posicao = random.nextInt(9); // Escolhe uma posição aleatória
+      } while (
+          tabuleiro[posicao].isNotEmpty); // Garante que a posição esteja vazia
 
-      tabuleiro[posicao] = 'O';
+      tabuleiro[posicao] = 'O'; // A máquina joga com 'O'
       rodadas++;
       verificarVencedor();
     }
-  }
-
-  int escolherPosicaoMaquina(int dificuldade) {
-    int posicao = 0;
-    if (dificuldade == 1) {
-      posicao = random.nextInt(9);
-    } else if (dificuldade == 2) {
-      posicao = bloquearJogador() ?? random.nextInt(9);
-    } else {
-      posicao = escolherMelhorMovimento();
-    }
-    return posicao;
-  }
-
-  int? bloquearJogador() {
-    for (int i = 0; i < 9; i++) {
-      if (tabuleiro[i].isEmpty) {
-        tabuleiro[i] = 'X';
-        if (verificarVencedorInterno('X') != '') {
-          tabuleiro[i] = '';
-          return i;
-        }
-        tabuleiro[i] = '';
-      }
-    }
-    return null;
-  }
-
-  int escolherMelhorMovimento() {
-    return random.nextInt(9);
-  }
-
-  String verificarVencedorInterno(String jogador) {
-    const combinacoesVitoriosas = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-
-    for (var combinacao in combinacoesVitoriosas) {
-      if (tabuleiro[combinacao[0]] == jogador &&
-          tabuleiro[combinacao[1]] == jogador &&
-          tabuleiro[combinacao[2]] == jogador) {
-        return jogador;
-      }
-    }
-    return '';
   }
 
   void alternarJogador() {

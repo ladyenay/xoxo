@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:xoxo/main.dart';
+import 'package:xoxo/main.dart'; // Ajuste para o caminho correto do seu arquivo principal.
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Verifica se o título do app aparece na tela',
+      (WidgetTester tester) async {
+    // Constrói o app e dispara um quadro.
+    await tester
+        .pumpWidget(const XoxOGame()); // Ajuste para o widget raiz do seu app.
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verifica se o título "XoxO" está sendo exibido.
+    expect(find.text('XoxO'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('Verifica a interação com o botão Reiniciar',
+      (WidgetTester tester) async {
+    // Constrói o app.
+    await tester.pumpWidget(const XoxOGame());
+
+    // Verifica se o botão "Reiniciar" está presente.
+    expect(find.text('Reiniciar'), findsOneWidget);
+
+    // Simula o clique no botão "Reiniciar".
+    await tester.tap(find.text('Reiniciar'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verifica se o estado esperado do app mudou (ajuste conforme a lógica do seu app).
+    expect(find.text('Jogador X venceu!'), findsNothing);
   });
 }
