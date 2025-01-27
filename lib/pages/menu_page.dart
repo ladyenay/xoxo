@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'jogo_da_velha_page.dart';
 
 class MenuPage extends StatelessWidget {
-  const MenuPage({Key? key}) : super(key: key);
+  const MenuPage({super.key});
 
   @override
   Widget build(BuildContext context) {

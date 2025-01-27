@@ -6,7 +6,7 @@ void main() {
 }
 
 class XoxOGame extends StatelessWidget {
-  const XoxOGame({Key? key}) : super(key: key);
+  const XoxOGame({super.key});
 
   @override
   Widget build(BuildContext context) {

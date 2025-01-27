@@ -4,7 +4,7 @@ import '../models/modelo_jogo.dart';
 class JogoDaVelhaPage extends StatefulWidget {
   final String modo;
 
-  const JogoDaVelhaPage({Key? key, required this.modo}) : super(key: key);
+  const JogoDaVelhaPage({super.key, required this.modo});
 
   @override
   _JogoDaVelhaPageState createState() => _JogoDaVelhaPageState();

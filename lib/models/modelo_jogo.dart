@@ -9,69 +9,90 @@ class ModeloJogo {
   String mensagemFimDeJogo = '';
   int vitoriasX = 0;
   int vitoriasO = 0;
+  bool _vezDaMaquina = false; // Controla a vez da máquina
 
   final Random random = Random();
 
+  // Função principal para registrar uma jogada
   void jogar(int posicao, String modo) {
+    if (_vezDaMaquina) return; // Bloqueia o jogador durante a jogada da máquina
+
     if (vencedor.isEmpty && tabuleiro[posicao].isEmpty) {
       tabuleiro[posicao] = jogadorAtual;
       rodadas++;
       verificarVencedor();
 
-      if (modo == 'PvM' && jogadorAtual == 'X' && vencedor.isEmpty) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          jogadaMaquina();
-        });
-      } else {
+      // Alterna jogador ou aciona a máquina se o modo for PvM
+      if (vencedor.isEmpty) {
         alternarJogador();
+        if (modo == 'PvM' && jogadorAtual == 'O') {
+          _vezDaMaquina = true; // Bloqueia o jogador enquanto a máquina joga
+           {
+            jogadaMaquina();
+          }
+        }
       }
     }
   }
 
+  // Jogada da máquina
   void jogadaMaquina() {
     if (vencedor.isEmpty && rodadas < 9) {
       int posicao;
-      int dificuldade = 1; // Definindo dificuldade para a máquina (fácil por padrão)
       do {
-        posicao = escolherPosicaoMaquina(dificuldade);
+        posicao = escolherMelhorMovimento();
       } while (tabuleiro[posicao].isNotEmpty);
 
       tabuleiro[posicao] = 'O';
       rodadas++;
       verificarVencedor();
+      _vezDaMaquina = false; // Libera o jogador após a jogada da máquina
+
+      if (vencedor.isEmpty) {
+        alternarJogador();
+      }
     }
   }
 
-  int escolherPosicaoMaquina(int dificuldade) {
-    int posicao = 0;
-    if (dificuldade == 1) {
-      posicao = random.nextInt(9);
-    } else if (dificuldade == 2) {
-      posicao = bloquearJogador() ?? random.nextInt(9);
-    } else {
-      posicao = escolherMelhorMovimento();
+  // Lógica para escolher a posição da máquina
+  int escolherMelhorMovimento() {
+    // Priorizar vitória da máquina
+    for (int i = 0; i < 9; i++) {
+      if (tabuleiro[i].isEmpty) {
+        tabuleiro[i] = 'O';
+        if (verificarVencedorInterno('O') != '') {
+          tabuleiro[i] = '';
+          return i; // Retorna a posição que garante a vitória
+        }
+        tabuleiro[i] = '';
+      }
     }
-    return posicao;
-  }
 
-  int? bloquearJogador() {
+    // Bloquear vitória do jogador
     for (int i = 0; i < 9; i++) {
       if (tabuleiro[i].isEmpty) {
         tabuleiro[i] = 'X';
         if (verificarVencedorInterno('X') != '') {
           tabuleiro[i] = '';
-          return i;
+          return i; // Retorna a posição que bloqueia o jogador
         }
         tabuleiro[i] = '';
       }
     }
-    return null;
-  }
 
-  int escolherMelhorMovimento() {
+    // Estratégia para ocupar posições centrais ou estratégicas
+    const posicoesPrioritarias = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+    for (int posicao in posicoesPrioritarias) {
+      if (tabuleiro[posicao].isEmpty) {
+        return posicao; // Escolhe uma posição prioritária disponível
+      }
+    }
+
+    // Caso todas as outras opções falhem (improvável)
     return random.nextInt(9);
   }
 
+  // Verifica se um jogador venceu (internamente, usado para lógica)
   String verificarVencedorInterno(String jogador) {
     const combinacoesVitoriosas = [
       [0, 1, 2],
@@ -94,10 +115,12 @@ class ModeloJogo {
     return '';
   }
 
+  // Alterna entre os jogadores
   void alternarJogador() {
     jogadorAtual = jogadorAtual == 'X' ? 'O' : 'X';
   }
 
+  // Verifica se alguém venceu ou se houve empate
   void verificarVencedor() {
     const combinacoesVitoriosas = [
       [0, 1, 2],
@@ -131,14 +154,17 @@ class ModeloJogo {
     }
   }
 
+  // Reinicia o jogo
   void reiniciar() {
     tabuleiro = ['', '', '', '', '', '', '', '', ''];
     vencedor = '';
     rodadas = 0;
     jogadorAtual = 'X';
     mensagemFimDeJogo = '';
+    _vezDaMaquina = false; // Garante que o jogador possa começar novamente
   }
 
+  // Define as cores para os jogadores
   Color corJogador(String jogador) {
     if (jogador == 'X') return Colors.blue;
     if (jogador == 'O') return Colors.red;
